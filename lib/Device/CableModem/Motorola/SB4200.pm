@@ -20,6 +20,7 @@ use Exception::Class (
 use Carp qw( croak );
 
 our $VERSION = '0.10';
+my  $AGENT   = sprintf "%s/%s", __PACKAGE__, $VERSION;
 
 sub new {
     my $class = shift;
@@ -46,12 +47,39 @@ sub new {
 
 sub restart {
     my $self = shift;
+    my $raw   = $self->_get( $self->{page_conf} );
+    my $form  = HTML::Form->parse( $raw, $self->{page_conf} );
+
+    foreach my $e ( $form->inputs ) {
+        next if $e->type ne 'submit';
+        if ( $e->value =~ m{Restart Cable Modem}si ) {
+            my $req = $e->click( $form ) || croak "Restart failed";
+            $req->uri( $self->{page_conf} );
+            my $response = $self->_req( $req );
+            return;
+        }
+    }
+
+    croak "Restart failed: the required button can not be found";
 }
 
 sub reset {
     my $self = shift;
-}
+    my $raw   = $self->_get( $self->{page_conf} );
+    my $form  = HTML::Form->parse( $raw, $self->{page_conf} );
 
+    foreach my $e ( $form->inputs ) {
+        next if $e->type ne 'submit';
+        if ( $e->value =~ m{Reset All Defaults}si ) {
+            my $req = $e->click( $form ) || croak "Reset failed";
+            $req->uri( $self->{page_conf} );
+            my $response = $self->_req( $req );
+            return;
+        }
+    }
+
+    croak "Reset failed: the required button can not be found";
+}
 sub config {
     my $self  = shift;
     my $raw   = $self->_get( $self->{page_conf} );
@@ -284,12 +312,18 @@ sub _trim {
     return $s;
 }
 
+sub agent {
+    my $self = shift;
+    my $ua   = LWP::UserAgent->new;
+    $ua->agent($AGENT);
+    $ua->timeout(5);
+    return $ua;
+}
+
 sub _get {
     my $self = shift;
     my $url  = shift;
-    my $ua   = LWP::UserAgent->new;
-    $ua->timeout(5);
-    my $r    = $ua->get($url);
+    my $r    = $self->agent->get($url);
 
     if ( $r->is_success ) {
         my $raw = $r->decoded_content;
@@ -307,9 +341,7 @@ sub _get {
 sub _req {
     my $self = shift;
     my $req  = shift;
-    my $ua   = LWP::UserAgent->new;
-    $ua->timeout(5);
-    my $r = $ua->request($req);
+    my $r    = $self->agent->request($req);
 
     if ( $r->is_success ) {
         my $raw = $r->decoded_content;
