@@ -389,6 +389,8 @@ Device::CableModem::Motorola::SB4200 - Interface to Motorola SurfBoard 4200 Cabl
 This module can be used to manage/fetch every setting available via the modem's
 web interface. It is also possible to restart/reset the modem.
 
+All methods will die upon failure.
+
 =head1 GENERAL METHODS
 
 =head2 new
