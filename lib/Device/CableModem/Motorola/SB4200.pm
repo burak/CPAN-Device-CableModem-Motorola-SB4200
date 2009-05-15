@@ -359,3 +359,119 @@ sub _req {
 1;
 
 __END__
+
+=head1 NAME
+
+Device::CableModem::Motorola::SB4200 - Interface to Motorola SurfBoard 4200 Cable Modem
+
+=head1 SYNOPSIS
+
+   use Device::CableModem::Motorola::SB4200;
+   
+   my $m = Device::CableModem::Motorola::SB4200->new(%opts);
+   
+   my %version = $m->versions;
+   my %status  = $m->status;
+   my %signal  = $m->signal;
+   my %addr    = $m->addresses;
+   my %config  = $m->config;
+   my @logs    = $m->logs;
+   
+   $m->restart;
+   $m->reset;
+   
+   my $fw = $version{software};
+   printf "Firmware version is %s-%s\n", $fw->{version}, $fw->{string};
+   die "Unknown device disguised as SB4200" if $fw->{model} ne 'SB4200';
+
+=head1 DESCRIPTION
+
+This module can be used to manage/fetch every setting available via the modem's
+web interface. It is also possible to restart/reset the modem.
+
+=head1 GENERAL METHODS
+
+=head2 new
+
+Contructor. Accepts named parameters listed below.
+
+=head3 ip
+
+Highly unlikely, but if the ip address of SB4200 is not C<192.168.100.1>,
+then you can set the ip address with this parameter.
+
+=head2 agent
+
+Returns a C<LWP::UserAgent> object.
+
+=head1 INFORMATION METHODS
+
+=head2 addresses
+
+Provides information about the servers the Cable Modem is using,
+and the computers to which it is connected.
+
+=head2 config
+
+Provides information about the manually configurable settings of the
+Cable Modem.
+
+=head2 logs
+
+Returns a list of available modem logs.
+
+=head2 set_config
+
+Can be used to alter every setting available via L</config>.
+
+   $m->set_config( FREQ_PLAN     => "EUROPE"  );
+   $m->set_config( FREQUENCY_MHZ => 543000001 );
+
+=head2 signal
+
+Provides information about the current upstream and downstream signal status
+of the Cable Modem.
+
+=head2 status
+
+Provides information about the startup process of the Cable Modem.
+
+=head2 versions
+
+Returns a list of hardware/software versions available in the modem.
+
+=head1 MODIFICATION METHODS
+
+=head2 reset
+
+From the modem page:
+
+   Resetting the cable modem to its factory default configuration will remove
+   all stored parameters learned by the cable modem during prior
+   initializations. The process to get back online from a factory default
+   condition could take from 5 to 30 minutes. Please reference the cable
+   modem User Guide for details on the power up sequence.
+
+=head2 restart
+
+Restarts the modem. Usually takes 1o seconds.
+
+=head2 SEE ALSO
+
+L<Device::CableModem::SURFboard>.
+
+=head1 AUTHOR
+
+Burak GE<252>rsoy, E<lt>burakE<64>cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2004-2009 Burak GE<252>rsoy. All rights reserved.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself, either Perl version 5.8.8 or, 
+at your option, any later version of Perl 5 you may have available.
+
+=cut
