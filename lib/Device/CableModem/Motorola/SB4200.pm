@@ -451,7 +451,7 @@ From the modem page:
 
 =head2 restart
 
-Restarts the modem. Usually takes 1o seconds.
+Restarts the modem. Usually takes 10 seconds.
 
 =head2 set_config
 
@@ -460,7 +460,7 @@ Can be used to alter every setting available via L</config>.
    $m->set_config( FREQ_PLAN     => "EUROPE"  );
    $m->set_config( FREQUENCY_MHZ => 543000001 );
 
-=head2 SEE ALSO
+=head1 SEE ALSO
 
 L<Device::CableModem::SURFboard>.
 
