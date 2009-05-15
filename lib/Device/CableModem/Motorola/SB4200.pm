@@ -422,13 +422,6 @@ Cable Modem.
 
 Returns a list of available modem logs.
 
-=head2 set_config
-
-Can be used to alter every setting available via L</config>.
-
-   $m->set_config( FREQ_PLAN     => "EUROPE"  );
-   $m->set_config( FREQUENCY_MHZ => 543000001 );
-
 =head2 signal
 
 Provides information about the current upstream and downstream signal status
@@ -458,6 +451,13 @@ From the modem page:
 
 Restarts the modem. Usually takes 1o seconds.
 
+=head2 set_config
+
+Can be used to alter every setting available via L</config>.
+
+   $m->set_config( FREQ_PLAN     => "EUROPE"  );
+   $m->set_config( FREQUENCY_MHZ => 543000001 );
+
 =head2 SEE ALSO
 
 L<Device::CableModem::SURFboard>.
@@ -468,7 +468,7 @@ Burak GE<252>rsoy, E<lt>burakE<64>cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2004-2009 Burak GE<252>rsoy. All rights reserved.
+Copyright 2009 Burak GE<252>rsoy. All rights reserved.
 
 =head1 LICENSE
 
