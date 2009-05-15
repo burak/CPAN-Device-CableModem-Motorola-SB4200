@@ -406,6 +406,8 @@ Returns a C<LWP::UserAgent> object.
 
 =head1 INFORMATION METHODS
 
+Use L<Data::Dumper> to see the outputs of these methods.
+
 =head2 addresses
 
 Provides information about the servers the Cable Modem is using,
