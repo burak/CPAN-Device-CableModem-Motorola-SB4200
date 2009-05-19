@@ -20,6 +20,9 @@ use Exception::Class (
         isa         => 'HTTP::Error',
         description => 'Unable to get a result from the server',
     },
+    'Modem::Error::Command' => {
+        description => 'Unable to get execute a modem command',
+    },
 );
 
 our $VERSION = '0.11';
@@ -59,14 +62,17 @@ sub restart {
     foreach my $e ( $form->inputs ) {
         next if $e->type ne 'submit';
         if ( $e->value =~ RE_BUTTON_RESTART ) {
-            my $req = $e->click( $form ) || croak "Restart failed";
+            my $req = $e->click( $form )
+                        || Modem::Error::Command->throw( "Restart failed" );
             $req->uri( $self->{page_conf} );
             my $response = $self->_req( $req );
             return;
         }
     }
 
-    croak "Restart failed: the required button can not be found";
+    Modem::Error::Command->throw(
+        "Restart failed: the required button can not be found"
+    );
 }
 
 sub reset {
@@ -77,14 +83,17 @@ sub reset {
     foreach my $e ( $form->inputs ) {
         next if $e->type ne 'submit';
         if ( $e->value =~ RE_BUTTON_RESET ) {
-            my $req = $e->click( $form ) || croak "Reset failed";
+            my $req = $e->click( $form )
+                        || Modem::Error::Command->throw( "Reset failed" );
             $req->uri( $self->{page_conf} );
             my $response = $self->_req( $req );
             return;
         }
     }
 
-    croak "Reset failed: the required button can not be found";
+    Modem::Error::Command->throw(
+        "Reset failed: the required button can not be found"
+    );
 }
 
 sub config {
