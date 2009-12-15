@@ -2,6 +2,9 @@ Revision history for Perl extension Device::CableModem::Motorola::SB4200.
 
 Time zone is GMT+2
 
+0.20 Wed Sep 30 04:26:40 2009
+   => Perl::Critic refactoring.
+
 0.11 Tue May 19 03:22:25 2009
    => Internal cleanup.
 

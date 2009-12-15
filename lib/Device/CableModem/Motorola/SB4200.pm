@@ -1,10 +1,11 @@
 package Device::CableModem::Motorola::SB4200;
 use strict;
 use warnings;
-use constant DEFAULT_IP => '192.168.100.1';
-use constant RE_BUTTON_RESTART => qr{Restart Cable Modem}si;
-use constant RE_BUTTON_RESET   => qr{Reset All Defaults}si;
+use constant DEFAULT_IP        => '192.168.100.1';
+use constant RE_BUTTON_RESTART => qr{\QRestart Cable Modem\E}xmsi;
+use constant RE_BUTTON_RESET   => qr{\QReset All Defaults\E}xmsi;
 use constant RE_404            => qr{<title> File \s Not \s Found </title>}xmsi;
+use constant UA_TIMEOUT        => 5;
 use LWP::UserAgent;
 use HTML::TableParser;
 use HTML::Form;
@@ -25,8 +26,8 @@ use Exception::Class (
     },
 );
 
-our $VERSION = '0.11';
-my  $AGENT   = sprintf "%s/%s", __PACKAGE__, $VERSION;
+our $VERSION = '0.20';
+my  $AGENT   = sprintf q{%s/%s}, __PACKAGE__, $VERSION;
 my  %PAGE    = (
     status => 'startupdata.html',
     signal => 'signaldata.html',
@@ -37,10 +38,10 @@ my  %PAGE    = (
 );
 
 sub new {
-    my $class = shift;
+    my($class, @args) = @_;
     my %opt   = (
         ip => DEFAULT_IP,
-        ( @_ % 2 ? () : @_ )
+        ( @args % 2 ? () : @args )
     );
 
     $opt{base_url} = sprintf 'http://%s/', $opt{ip};
@@ -63,19 +64,19 @@ sub restart {
         next if $e->type ne 'submit';
         if ( $e->value =~ RE_BUTTON_RESTART ) {
             my $req = $e->click( $form )
-                        || Modem::Error::Command->throw( "Restart failed" );
+                        || Modem::Error::Command->throw( 'Restart failed' );
             $req->uri( $self->{page_conf} );
             my $response = $self->_req( $req );
             return;
         }
     }
 
-    Modem::Error::Command->throw(
-        "Restart failed: the required button can not be found"
+    return Modem::Error::Command->throw(
+        'Restart failed: the required button can not be found'
     );
 }
 
-sub reset {
+sub reset { ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
     my $raw   = $self->_get( $self->{page_conf} );
     my $form  = HTML::Form->parse( $raw, $self->{page_conf} );
@@ -84,15 +85,15 @@ sub reset {
         next if $e->type ne 'submit';
         if ( $e->value =~ RE_BUTTON_RESET ) {
             my $req = $e->click( $form )
-                        || Modem::Error::Command->throw( "Reset failed" );
+                        || Modem::Error::Command->throw( 'Reset failed' );
             $req->uri( $self->{page_conf} );
             my $response = $self->_req( $req );
             return;
         }
     }
 
-    Modem::Error::Command->throw(
-        "Reset failed: the required button can not be found"
+    return Modem::Error::Command->throw(
+        'Reset failed: the required button can not be found'
     );
 }
 
@@ -110,9 +111,9 @@ sub config {
 
 sub set_config {
     my $self  = shift;
-    my $name  = shift || croak "Config name not present";
+    my $name  = shift || croak 'Config name not present';
     my $value = shift;
-    croak "Config value not present" if not defined $value;
+    croak 'Config value not present' if not defined $value;
     my $raw   = $self->_get( $self->{page_conf} );
     my $form  = HTML::Form->parse( $raw, $self->{page_conf} );
 
@@ -120,10 +121,10 @@ sub set_config {
     foreach my $e ( @{ $form->inputs } ) {
         next if $e->type eq 'submit' || $e->name ne $name;
         if ( my @possible = $e->possible_values ) {
-            my %valid = map { (defined $_ ? $_ : 0), 1 } @possible;
+            my %valid = map { ( (defined $_ ? $_ : 0), 1 ) } @possible;
             if ( ! $valid{ $value } ) {
                 croak "The value ($value) for $name is not valid. "
-                     ."You should select one of  these: " . join(' ',keys %valid);
+                     .'You should select one of  these: ' . join q{ }, keys %valid;
             }
         }
         $input = $e;
@@ -179,7 +180,7 @@ sub addresses {
                                            : { value => $value }
                                            ;
     }
-    
+
     my %rv = (
         %list,
         known_cpe_mac_addresses => [ @mac ],
@@ -229,12 +230,12 @@ sub signal {
         \@up{   qw( frequency power_level symbol_rate           ) },
         \@down{ qw( frequency power_level signal_to_noise_ratio ) },
     ) {
-        my($value, $unit, $status) = split m{\s+}xms, $$v;
-        $$v = {
+        my($value, $unit, $status) = split m{\s+}xms, ${$v};
+        ${$v} = {
             value  => $value,
             unit   => $unit,
         };
-        $$v->{status} = $status if defined $status;
+        ${$v}->{status} = $status if defined $status;
     }
 
     my %rv = (
@@ -305,9 +306,13 @@ sub logs {
 sub versions {
     my $self = shift;
     my $raw  = $self->_get( $self->{page_help} );
-    croak "Can not get version from $self->{page_help} output: $raw"
-        if $raw !~ m{<td.+?>(.+?version.+?)</td>}xmsi;
-    (my $v = $1) =~ s{<br>}{}xmsig;
+    my $v;
+    if ( $raw =~ m{<td.+?>(.+?version.+?)</td>}xmsi ) {
+       ($v = $1) =~ s{<br>}{}xmsig;
+    }
+    else {
+       croak "Can not get version from $self->{page_help} output: $raw"
+    };
     my %rv;
     foreach my $vs ( split m/ \r? \n /xms, $self->_trim( $v ) ) {
         my($name, $value) = split m/ : \s+ /xms, $vs;
@@ -318,7 +323,7 @@ sub versions {
     $rv{software} = {
         model   => shift @soft,
         version => shift @soft,
-        string  => join('-', @soft),
+        string  => join( q{-}, @soft ),
     };
     return %rv;
 }
@@ -335,7 +340,7 @@ sub agent {
     my $self = shift;
     my $ua   = LWP::UserAgent->new;
     $ua->agent($AGENT);
-    $ua->timeout(5);
+    $ua->timeout( UA_TIMEOUT );
     return $ua;
 }
 
@@ -352,7 +357,9 @@ sub _get {
         return $raw;
     }
 
-    HTTP::Error::Connection->throw( "GET request failed: " . $r->as_string );
+    return  HTTP::Error::Connection->throw(
+                'GET request failed: ' . $r->as_string
+            );
 }
 
 sub _req {
@@ -363,12 +370,14 @@ sub _req {
     if ( $r->is_success ) {
         my $raw = $r->decoded_content;
         HTTP::Error::NotFound->throw(
-            "The request is invalid. Server returned a 404 error"
+            'The request is invalid. Server returned a 404 error'
         ) if $raw =~ RE_404;
         return $raw;
     }
 
-    HTTP::Error::Connection->throw( "HTTP::Request failed: " . $r->as_string );
+    return  HTTP::Error::Connection->throw(
+                'HTTP::Request failed: ' . $r->as_string
+            );
 }
 
 1;
@@ -478,19 +487,5 @@ Can be used to alter every setting available via L</config>.
 =head1 SEE ALSO
 
 L<Device::CableModem::SURFboard>.
-
-=head1 AUTHOR
-
-Burak GE<252>rsoy, E<lt>burakE<64>cpan.orgE<gt>
-
-=head1 COPYRIGHT
-
-Copyright 2009 Burak GE<252>rsoy. All rights reserved.
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify 
-it under the same terms as Perl itself, either Perl version 5.8.8 or, 
-at your option, any later version of Perl 5 you may have available.
 
 =cut
