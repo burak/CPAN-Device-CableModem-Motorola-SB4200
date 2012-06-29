@@ -149,7 +149,7 @@ sub addresses {
 
     my $list = sub {
         my ( $id, $line, $cols, $udata ) = @_;
-        (my $name = lc $cols->[0]) =~ tr/ /_/d;
+        (my $name = lc $cols->[0]) =~ tr/ /_/;
         $list{ $name } = $cols->[1];
         return;
     };
@@ -206,14 +206,14 @@ sub signal {
 
     my $down_row = sub {
         my ( $id, $line, $cols, $udata ) = @_;
-        (my $name = lc $cols->[0]) =~ tr/ /_/d;
+        (my $name = lc $cols->[0]) =~ tr/ /_/;
         $down{ $name } = $cols->[1];
         return;
     };
 
     my $up_row = sub {
         my ( $id, $line, $cols, $udata ) = @_;
-        (my $name = lc $cols->[0]) =~ tr/ /_/d;
+        (my $name = lc $cols->[0]) =~ tr/ /_/;
         $up{ $name } = $cols->[1];
         return;
     };
@@ -253,7 +253,7 @@ sub status {
 
     my $cb_row = sub {
         my ( $id, $line, $cols, $udata ) = @_;
-        (my $name = lc $cols->[0]) =~ tr/ /_/d;
+        (my $name = lc $cols->[0]) =~ tr/ /_/;
         $rv{ $name } = $cols->[1];
         return;
     };

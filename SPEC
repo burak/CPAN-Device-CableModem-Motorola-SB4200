@@ -12,4 +12,9 @@
             repository => 'http://bitbucket.org/burak/cpan-device-cablemodem-motorola-sb4200/',
         },
     },
+    BUILDER => {
+        change_versions                  => 1,
+        copyright_first_year             => '2009',
+        add_pod_author_copyright_license => 1,
+    },
 }
