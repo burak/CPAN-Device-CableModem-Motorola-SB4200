@@ -26,7 +26,8 @@ use Exception::Class (
     },
 );
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
+
 my  $AGENT   = sprintf q{%s/%s}, __PACKAGE__, $VERSION;
 my  %PAGE    = (
     status => 'startupdata.html',
