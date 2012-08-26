@@ -26,7 +26,7 @@ use Exception::Class (
     },
 );
 
-our $VERSION = '0.21';
+our $VERSION = '0.11';
 
 my  $AGENT   = sprintf q{%s/%s}, __PACKAGE__, $VERSION;
 my  %PAGE    = (
@@ -384,6 +384,10 @@ sub _req {
 1;
 
 __END__
+
+=pod
+
+=encoding utf8
 
 =head1 NAME
 
