@@ -8,7 +8,7 @@
     },
     meta_merge => {
         resources => {
-            repository => 'http://bitbucket.org/burak/cpan-device-cablemodem-motorola-sb4200/',
+            repository => 'http://github.com/burak/cpan-device-cablemodem-motorola-sb4200/',
         },
     },
     BUILDER => {
