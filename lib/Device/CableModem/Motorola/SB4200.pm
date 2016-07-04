@@ -26,7 +26,7 @@ use Exception::Class (
     },
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my  $AGENT   = sprintf q{%s/%s}, __PACKAGE__, $VERSION;
 my  %PAGE    = (
