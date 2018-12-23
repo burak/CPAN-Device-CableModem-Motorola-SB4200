@@ -1,4 +1,5 @@
 package Device::CableModem::Motorola::SB4200;
+
 use strict;
 use warnings;
 use constant DEFAULT_IP        => '192.168.100.1';
@@ -26,9 +27,7 @@ use Exception::Class (
     },
 );
 
-our $VERSION = '0.12';
-
-my  $AGENT   = sprintf q{%s/%s}, __PACKAGE__, $VERSION;
+my  $AGENT   = sprintf q{%s/%s}, __PACKAGE__, __PACKAGE__->VERSION;
 my  %PAGE    = (
     status => 'startupdata.html',
     signal => 'signaldata.html',

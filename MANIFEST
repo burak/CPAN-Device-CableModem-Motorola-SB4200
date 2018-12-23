@@ -1,8 +1,0 @@
-lib/Device/CableModem/Motorola/SB4200.pm
-t/001-use.t
-Changes
-Build.PL
-MANIFEST
-MANIFEST.SKIP
-README
-SPEC
